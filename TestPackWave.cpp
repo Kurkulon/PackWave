@@ -203,6 +203,9 @@ static i16  unpWave3[2048];
 static i16  unpWave4[2048];
 
 static MDCT_DATA mdctw[1024];
+static MDCT_DATA mout1[512];
+static MDCT_DATA mout2[512];
+static MDCT_DATA mout3[512];
 
 static float    fdctw[512];
 static i16      fdWave3[512];
@@ -242,7 +245,7 @@ static void Test(i16* src, i16* dst, u16 len, const char* str)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-const byte log2n = 6;
+const byte log2n = 7;
 const u16 N = 1UL << log2n;
 
 MDCT_TRIG   trig[N*2];
@@ -272,13 +275,24 @@ int main()
 
     //mdct_window(&init, wave1, mdctw);
 
-    //for (u16 i = 0; i < N; i++) mdctw[i] = wave1[i];
+    for (u16 i = 0; i < N; i++) mdctw[i] = wave1[i];
 
-    //mdct_forward(&init, mdctw, mdctw);
-    //mdct_backward(&init, mdctw, mdctw);
+    //mdct_forward(&init, mdctw, mout1);
+    //mdct_backward(&init, mout1, mout1);
 
-    WavePack_MDCT(&init, wave4, mdctw, 1024, 0, 0);
-    WaveUnpack_MDCT(&init, mdctw, unpWave1, 1024);
+    //mdct_forward(&init, mdctw+N/2, mout2);
+    //mdct_backward(&init, mout2, mout3+N/2);
+
+    //for (u16 i = N/2; i < N*3/2; i++) mout1[i] += mout3[i];
+
+    WavePack_MDCT(&init, wave1, mdctw, 996, 0, 0);
+
+    for (u16 n = 0; n < 996; n += N / 2)
+    {
+        for (u16 i = N / 4; i < N / 2; i++) mdctw[n + i] = 0;
+    };
+
+    WaveUnpack_MDCT(&init, mdctw, unpWave1, 996);
 
     Test(wave1, unpWave1, 996,  "Wave1 4AK");
     Test(wave2, unpWave1, 996,  "Wave2 4AK");
