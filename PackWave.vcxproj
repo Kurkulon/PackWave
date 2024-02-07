@@ -221,6 +221,15 @@
     <ClInclude Include="..\G_LIBS_BF592\cpp\mdct_imp.h" />
     <ClInclude Include="..\G_LIBS_BF592\cpp\wavepack_imp.h" />
     <ClInclude Include="cpp\framework.h" />
+    <ClInclude Include="cpp\G.722.1\basop32.h" />
+    <ClInclude Include="cpp\G.722.1\count.h" />
+    <ClInclude Include="cpp\G.722.1\dct4_a.h" />
+    <ClInclude Include="cpp\G.722.1\dct4_s.h" />
+    <ClInclude Include="cpp\G.722.1\defs.h" />
+    <ClInclude Include="cpp\G.722.1\huff_def.h" />
+    <ClInclude Include="cpp\G.722.1\huff_tab.h" />
+    <ClInclude Include="cpp\G.722.1\tables.h" />
+    <ClInclude Include="cpp\G.722.1\typedef.h" />
     <ClInclude Include="cpp\PackWave.h" />
     <ClInclude Include="cpp\pch.h" />
   </ItemGroup>
@@ -229,6 +238,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp\dllmain.cpp" />
+    <ClCompile Include="cpp\G.722.1\basop32.cpp" />
+    <ClCompile Include="cpp\G.722.1\coef2sam.cpp" />
+    <ClCompile Include="cpp\G.722.1\common.cpp" />
+    <ClCompile Include="cpp\G.722.1\count.cpp" />
+    <ClCompile Include="cpp\G.722.1\dct4_a.cpp" />
+    <ClCompile Include="cpp\G.722.1\dct4_s.cpp" />
+    <ClCompile Include="cpp\G.722.1\decoder.cpp" />
+    <ClCompile Include="cpp\G.722.1\encoder.cpp" />
+    <ClCompile Include="cpp\G.722.1\huff_tab.cpp" />
+    <ClCompile Include="cpp\G.722.1\sam2coef.cpp" />
+    <ClCompile Include="cpp\G.722.1\tables.cpp" />
     <ClCompile Include="cpp\pack.cpp" />
     <ClCompile Include="cpp\pch.cpp" />
   </ItemGroup>

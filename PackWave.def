@@ -19,3 +19,5 @@ EXPORTS
     mdct_backward
     WavePack_MDCT
     WaveUnpack_MDCT
+    PW_Pack_G722
+    PW_Unpack_G722

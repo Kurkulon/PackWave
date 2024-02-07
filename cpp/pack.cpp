@@ -86,6 +86,81 @@ float PW_Determination(i16* w1, i16* w2, u16 len, float* pE)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+#define MAX_SAMPLE_RATE 32000
+#define MAX_FRAMESIZE   (MAX_SAMPLE_RATE/50)
+#define MEASURE_WMOPS   1
+#define WMOPS           1
+
+void PW_Pack_G722(Word16* input, Word16* out_words, Word16 frame_size, Word16 number_of_bits_per_frame, Word16 number_of_regions)
+{
+    //Word16  samples;
+   // Word16  input[MAX_FRAMESIZE];
+    Word16  history[MAX_FRAMESIZE];
+    //Word16  number_of_16bit_words_per_frame;
+    //Word16  out_words[MAX_BITS_PER_FRAME / 16];
+    Word16  mag_shift;
+    //Word16  i;
+    Word16  mlt_coefs[MAX_FRAMESIZE];
+    Word16  frame_cnt = 0;
+
+    for (Word16 i = 0; i < frame_size; i++) history[i] = 0;
+
+    /* Convert input samples to rmlt coefs */
+    mag_shift = samples_to_rmlt_coefs(input, history, mlt_coefs, frame_size);
+
+
+    /* Encode the mlt coefs */
+    encoder(number_of_bits_per_frame, number_of_regions, mlt_coefs, mag_shift, out_words);
+
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void PW_Unpack_G722(Word16* out_words, Word16* output, Word16 frame_size, Word16 number_of_bits_per_frame, Word16 number_of_regions)
+{
+    Word16 i;
+   // Word16 words;
+   // Word16 output[MAX_DCT_LENGTH];
+    //Word16 number_of_16bit_words_per_frame;
+    //Word16 out_words[MAX_BITS_PER_FRAME / 16];
+    Word16 frame_error_flag = 0;
+    Word16 frame_cnt = 0;
+    Word16 decoder_mlt_coefs[MAX_DCT_LENGTH];
+    Word16 mag_shift;
+    Word16 old_mag_shift = 0;
+    Word16 old_decoder_mlt_coefs[MAX_DCT_LENGTH];
+    Word16 old_samples[MAX_DCT_LENGTH >> 1];
+    Bit_Obj bitobj;
+    Rand_Obj randobj;
+
+    for (i = 0; i < frame_size; i++) old_decoder_mlt_coefs[i] = 0;
+
+    for (i = 0; i < (frame_size >> 1); i++) old_samples[i] = 0;
+
+    /* initialize the random number generator */
+    randobj.seed0 = 1;
+    randobj.seed1 = 1;
+    randobj.seed2 = 1;
+    randobj.seed3 = 1;
+
+    /* reinit the current word to point to the start of the buffer */
+    bitobj.code_word_ptr = out_words;
+    bitobj.current_word = *out_words;
+    bitobj.code_bit_count = 0;
+    bitobj.number_of_bits_left = number_of_bits_per_frame;
+
+    decoder(&bitobj, &randobj, number_of_regions, decoder_mlt_coefs, &mag_shift, &old_mag_shift, old_decoder_mlt_coefs, frame_error_flag);
+
+    /* convert the decoder_mlt_coefs to samples */
+    rmlt_coefs_to_samples(decoder_mlt_coefs, old_samples, output, frame_size, mag_shift);
+
+    /* For ITU testing, off the 2 lsbs. */
+    for (i = 0; i < frame_size; i++) output[i] &= 0xfffc;
+
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* pCompressRatio, float* pDet, float* pDev)
 {
     byte buf[4092];

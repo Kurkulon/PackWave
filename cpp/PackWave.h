@@ -4,6 +4,7 @@
 #include "..\..\G_LIBS_BF592\cpp\types.h"
 #include "..\..\G_LIBS_BF592\cpp\fdct.h"
 #include "..\..\G_LIBS_BF592\cpp\mdct.h"
+#include "G.722.1\defs.h"
 
 enum PackType { PACK_NO = 0, PACK_ULAW12, PACK_ULAW16, PACK_ADPCMIMA, PACK_DCT0, PACK_DCT1, PACK_DCT2, PACK_DCT3 };
 
@@ -22,5 +23,8 @@ extern u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* p
 
 extern u16 WavePack_MDCT(MDCT_LookUp* init, i16* src, MDCT_DATA* dst, u16 len, u16 shift, u16* packedLen);
 extern u16 WaveUnpack_MDCT(MDCT_LookUp* init, MDCT_DATA* src, i16* dst, u16 len);
+
+extern void PW_Pack_G722(Word16* input, Word16* out_words, Word16 frame_size, Word16 number_of_bits_per_frame, Word16 number_of_regions);
+extern void PW_Unpack_G722(Word16* out_words, Word16* output, Word16 frame_size, Word16 number_of_bits_per_frame, Word16 number_of_regions);
 
 #endif //PACKWAVE_H__31_01_2024__17_19

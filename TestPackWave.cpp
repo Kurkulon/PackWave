@@ -4,6 +4,7 @@
 //#include <iostream>
 
 #include "cpp\PackWave.h"
+#include "cpp\G.722.1\defs.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -202,6 +203,9 @@ static i16  unpWave2[2048];
 static i16  unpWave3[2048];
 static i16  unpWave4[2048];
 
+static i16  packed1[640];
+static i16  packed2[640];
+
 static MDCT_DATA mdctw[1024];
 static MDCT_DATA mout1[512];
 static MDCT_DATA mout2[512];
@@ -265,6 +269,12 @@ int main()
     //PW_Pack_uLaw_16Bit(wave1, buf1, 996);
     //PW_Unpack_uLaw_16Bit(buf1, unpWave1, 996);
 
+    for (u16 i = 0; i < 996; i++) wave1[i] /= 256;
+
+    PW_Pack_G722    ( wave1,    packed1,    640, 60*16, 28);
+    PW_Unpack_G722  ( packed1,  unpWave1,   640, 60*16, 28);
+
+    //PW_Pack_G722(wave1, packed2, 160, 16*16, 14);
 
     MDCT_LookUp init;
 
