@@ -207,9 +207,9 @@ static i16  packed1[640];
 static i16  packed2[640];
 
 static MDCT_DATA mdctw[1024];
-static MDCT_DATA mout1[512];
-static MDCT_DATA mout2[512];
-static MDCT_DATA mout3[512];
+static MDCT_DATA mout1[1024];
+static MDCT_DATA mout2[1024];
+static MDCT_DATA mout3[1024];
 
 static float    fdctw[512];
 static i16      fdWave3[512];
@@ -269,10 +269,8 @@ int main()
     //PW_Pack_uLaw_16Bit(wave1, buf1, 996);
     //PW_Unpack_uLaw_16Bit(buf1, unpWave1, 996);
 
-    for (u16 i = 0; i < 996; i++) wave1[i] /= 256;
-
-    PW_Pack_G722    ( wave1,    packed1,    640, 60*16, 28);
-    PW_Unpack_G722  ( packed1,  unpWave1,   640, 60*16, 28);
+//    PW_Pack_G722    ( wave1,    packed1,    640, 60*16, 28);
+ //   PW_Unpack_G722  ( packed1,  unpWave1,   640, 60*16, 28);
 
     //PW_Pack_G722(wave1, packed2, 160, 16*16, 14);
 
@@ -293,13 +291,13 @@ int main()
     //mdct_forward(&init, mdctw+N/2, mout2);
     //mdct_backward(&init, mout2, mout3+N/2);
 
-    //for (u16 i = N/2; i < N*3/2; i++) mout1[i] += mout3[i];
+    //for (u16 i = N/2; i < N*3/2; i++) mout1[i] = (mout1[i] + mout3[i])/2;
 
     WavePack_MDCT(&init, wave1, mdctw, 996, 0, 0);
 
     for (u16 n = 0; n < 996; n += N / 2)
     {
-        for (u16 i = N / 4; i < N / 2; i++) mdctw[n + i] = 0;
+       for (u16 i = N / 4; i < N / 2; i++) mdctw[n + i] = 0;
     };
 
     WaveUnpack_MDCT(&init, mdctw, unpWave1, 996);
