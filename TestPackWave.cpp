@@ -4,7 +4,7 @@
 //#include <iostream>
 
 #include "cpp\PackWave.h"
-#include "cpp\G.722.1\defs.h"
+//#include "cpp\G.722.1\defs.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -264,43 +264,6 @@ MDCT_DATA   temp2[N];
 int main()
 {
     float cmpRat = 0, det = 0, dev = 0;
-    //u32 len;
-
-    //PW_Pack_uLaw_16Bit(wave1, buf1, 996);
-    //PW_Unpack_uLaw_16Bit(buf1, unpWave1, 996);
-
-//    PW_Pack_G722    ( wave1,    packed1,    640, 60*16, 28);
- //   PW_Unpack_G722  ( packed1,  unpWave1,   640, 60*16, 28);
-
-    //PW_Pack_G722(wave1, packed2, 160, 16*16, 14);
-
-    MDCT_LookUp init;
-
-    mdct_init(&init, log2n, bitrev, trig, win);
-    init.work = work;
-    init.temp1 = temp1;
-    init.temp2 = temp2;
-
-    //mdct_window(&init, wave1, mdctw);
-
-    for (u16 i = 0; i < N; i++) mdctw[i] = wave1[i];
-
-    //mdct_forward(&init, mdctw, mout1);
-    //mdct_backward(&init, mout1, mout1);
-
-    //mdct_forward(&init, mdctw+N/2, mout2);
-    //mdct_backward(&init, mout2, mout3+N/2);
-
-    //for (u16 i = N/2; i < N*3/2; i++) mout1[i] = (mout1[i] + mout3[i])/2;
-
-    WavePack_MDCT(&init, wave1, mdctw, 996, 0, 0);
-
-    for (u16 n = 0; n < 996; n += N / 2)
-    {
-       for (u16 i = N / 4; i < N / 2; i++) mdctw[n + i] = 0;
-    };
-
-    WaveUnpack_MDCT(&init, mdctw, unpWave1, 996);
 
     Test(wave1, unpWave1, 996,  "Wave1 4AK");
     Test(wave2, unpWave1, 996,  "Wave2 4AK");

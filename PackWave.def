@@ -13,11 +13,3 @@ EXPORTS
     FDCT_Forward
     FDCT_Inverse
     PW_Determination
-    mdct_init
-    mdct_window
-    mdct_forward
-    mdct_backward
-    WavePack_MDCT
-    WaveUnpack_MDCT
-    PW_Pack_G722
-    PW_Unpack_G722

@@ -13,20 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="G.722.1">
-      <UniqueIdentifier>{e4595c1c-9a2c-4487-b93e-4f7dd65032ef}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\G_LIBS_BF592\cpp\fdct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\G_LIBS_BF592\cpp\fdct_imp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\G_LIBS_BF592\cpp\wavepack_imp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cpp\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,38 +24,23 @@
     <ClInclude Include="cpp\PackWave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\G_LIBS_BF592\cpp\mdct.h">
+    <ClInclude Include="..\G_LIBS\cpp\WAVEPACK\fdct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\G_LIBS_BF592\cpp\mdct_imp.h">
+    <ClInclude Include="..\G_LIBS\cpp\WAVEPACK\fdct_imp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\G.722.1\basop32.h">
-      <Filter>G.722.1</Filter>
+    <ClInclude Include="..\G_LIBS\cpp\WAVEPACK\mdct.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\G.722.1\count.h">
-      <Filter>G.722.1</Filter>
+    <ClInclude Include="..\G_LIBS\cpp\WAVEPACK\mdct_imp.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\G.722.1\dct4_a.h">
-      <Filter>G.722.1</Filter>
+    <ClInclude Include="..\G_LIBS\cpp\WAVEPACK\wavepack_imp.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\G.722.1\dct4_s.h">
-      <Filter>G.722.1</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\G.722.1\defs.h">
-      <Filter>G.722.1</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\G.722.1\huff_def.h">
-      <Filter>G.722.1</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\G.722.1\huff_tab.h">
-      <Filter>G.722.1</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\G.722.1\tables.h">
-      <Filter>G.722.1</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\G.722.1\typedef.h">
-      <Filter>G.722.1</Filter>
+    <ClInclude Include="..\G_LIBS\cpp\types.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,39 +57,6 @@
     </ClCompile>
     <ClCompile Include="cpp\pch.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\basop32.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\coef2sam.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\common.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\count.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\dct4_a.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\dct4_s.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\decoder.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\encoder.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\huff_tab.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\sam2coef.cpp">
-      <Filter>G.722.1</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\G.722.1\tables.cpp">
-      <Filter>G.722.1</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
