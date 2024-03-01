@@ -52,14 +52,14 @@ void PW_Unpack_ADPCMIMA(byte* src, i16* dst, u16 len)
 
 u16 PW_Pack_FDCT(i16* src, byte* dst, u16 len, u16 shift, u16 OVRLAP, u16 maxPackLen, u16* packedLen)
 {
-	return WavePack_FDCT(src, dst, len, shift, OVRLAP, maxPackLen, packedLen);
+	return WavePack_FDCT12(src, dst, len, shift, OVRLAP, maxPackLen, packedLen);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 u16 PW_Unpack_FDCT(byte* src, i16* dst, u16 srcLen, u16 OVRLAP)
 {
-	return WaveUnpack_FDCT(src, dst, srcLen, OVRLAP);
+	return WaveUnpack_FDCT12(src, dst, srcLen, OVRLAP);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
