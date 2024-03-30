@@ -1,12 +1,12 @@
 #ifndef PACKWAVE_H__31_01_2024__17_19
 #define PACKWAVE_H__31_01_2024__17_19
 
-#include "..\..\G_LIBS\cpp\types.h"
+#include "..\..\G_LIBS\cpp\WavePack\wavepack.h"
 #include "..\..\G_LIBS\cpp\WavePack\fdct.h"
 #include "..\..\G_LIBS\cpp\WavePack\mdct.h"
 //#include "G.722.1\defs.h"
 
-enum PackType { PACK_NO = 0, PACK_ULAW12, PACK_ULAW16, PACK_ADPCMIMA, PACK_DCT0, PACK_DCT1, PACK_DCT2, PACK_DCT3 };
+//enum PackType { PACK_NO = 0, PACK_ULAW12, PACK_ULAW16, PACK_ADPCMIMA, PACK_DCT0, PACK_DCT1, PACK_DCT2, PACK_DCT3 };
 
 extern float PW_Determination(i16* w1, i16* w2, u16 len, float* pE);
 extern void PW_Pack_uLaw_12Bit(i16* src, byte* dst, u16 len);

@@ -10,6 +10,8 @@
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+extern int nand_calculate_ecc(const byte* dat, byte* ecc_code);
+extern int nand_correct_data(byte* dat, byte* read_ecc, byte* calc_ecc);
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -270,6 +272,19 @@ MDCT_DATA   temp2[N];
 
 int main()
 {
+    byte ecc1[3];
+    byte ecc2[3];
+
+    for (u32 i = 0; i < 256; i++) buf1[i] = (byte)wave1[i];
+
+    nand_calculate_ecc(buf1, ecc1);
+
+    buf1[0] ^= 0x81;
+
+    nand_calculate_ecc(buf1+1, ecc2);
+
+    nand_correct_data(buf1, ecc1, ecc2);
+
     float cmpRat = 0, det = 0, dev = 0;
 
     Test(wave1, unpWave1, 996,  "Wave1 4AK");

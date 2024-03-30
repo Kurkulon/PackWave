@@ -10,7 +10,7 @@
 
 void PW_Pack_uLaw_12Bit(i16* src, byte* dst, u16 len)
 {
-	WavePack_uLaw_12Bit((u16*)src, dst, len);
+	WavePack_uLaw_12Bit(src, dst, len);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -24,7 +24,7 @@ void PW_Unpack_uLaw_12Bit(byte* src, i16* dst, u16 len)
 
 void PW_Pack_uLaw_16Bit(i16* src, byte* dst, u16 len)
 {
-	WavePack_uLaw_16Bit((u16*)src, dst, len);
+	WavePack_uLaw_16Bit(src, dst, len);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,7 +38,7 @@ void PW_Unpack_uLaw_16Bit(byte* src, i16* dst, u16 len)
 
 void PW_Pack_ADPCMIMA(i16* src, byte* dst, u16 len)
 {
-	WavePack_ADPCMIMA((u16*)src, dst, len);
+	WavePack_ADPCMIMA(src, dst, len);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
