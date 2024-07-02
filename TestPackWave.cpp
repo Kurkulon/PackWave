@@ -4,6 +4,7 @@
 //#include <iostream>
 
 #include "cpp\PackWave.h"
+#include "cpp\Wavelet.h"
 //#include "cpp\G.722.1\defs.h"
 #include <math.h>
 #include <stdio.h>
@@ -272,20 +273,20 @@ MDCT_DATA   temp2[N];
 
 int main()
 {
-    byte ecc1[3];
-    byte ecc2[3];
+    //byte ecc1[3];
+    //byte ecc2[3];
 
-    for (u32 i = 0; i < 256; i++) buf1[i] = (byte)wave1[i];
+    //for (u32 i = 0; i < 256; i++) buf1[i] = (byte)wave1[i];
 
-    nand_calculate_ecc(buf1, ecc1);
+    //nand_calculate_ecc(buf1, ecc1);
 
-    buf1[0] ^= 0x81;
+    //buf1[0] ^= 0x81;
 
-    nand_calculate_ecc(buf1+1, ecc2);
+    //nand_calculate_ecc(buf1+1, ecc2);
 
-    nand_correct_data(buf1, ecc1, ecc2);
+    //nand_correct_data(buf1, ecc1, ecc2);
 
-    float cmpRat = 0, det = 0, dev = 0;
+    // float cmpRat = 0, det = 0, dev = 0;
 
     Test(wave1, unpWave1, 996,  "Wave1 4AK");
     Test(wave2, unpWave1, 996,  "Wave2 4AK");
@@ -306,6 +307,19 @@ int main()
     Test(wave5, unpWave1, 128,  "Wave5 8AD-X");
 
     Test(wave6, unpWave1, 120,  "Wave6 USIT");
+
+    FWT_DATA temp[1024];
+    FWT_DATA vec[1024];
+
+    for (u16 i = 0; i < ArraySize(wave3); i++) vec[i] = wave3[i]+1000;
+
+    u16 step = 6;
+
+    Wavelet(vec, 9, step, temp);
+
+    for (u16 i = 512>>(step/2); i < ArraySize(vec); i++) vec[i] = 0, temp[i] = 0;
+
+    InvWavelet(vec, 9, step-1, temp);
 
 
     //det1 = PW_Determination(wave1, unpWave1, 996, &dev1);

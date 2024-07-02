@@ -170,7 +170,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp\nand_ecc.cpp" />
+    <ClCompile Include="cpp\wavelet.cpp" />
     <ClCompile Include="TestPackWave.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cpp\wavelet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
