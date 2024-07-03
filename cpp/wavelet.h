@@ -5,7 +5,7 @@
 
 //#define FWT_LOG2N	6
 //#define FWT_MIN		2
-#define FWT_DAUB8
+#define FWT_DAUB4
 
 #define FWT_FLOAT
 
