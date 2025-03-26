@@ -1,6 +1,18 @@
 //#include "types.h"
 
-#define FDCT_LOG2N 6
+#ifdef WAVEPACK_V2
+
+#define FDCT_LOG2N		8
+#define FDCT_TRIG		u16
+#define FDCT_TRIGBITS	(17-FDCT_LOG2N)
+
+#else
+
+#define FDCT_LOG2N		6
+#define FDCT_TRIG		u16
+#define FDCT_TRIGBITS	(17-FDCT_LOG2N)
+
+#endif
 
 #include "..\..\G_LIBS\cpp\WavePack\fdct_imp.h"
 #include "..\..\G_LIBS\cpp\WavePack\mdct_imp.h"
@@ -147,8 +159,8 @@ u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* pCompres
 
         if (len > ArraySize(buf)) len = ArraySize(buf);
 
-        len = PW_Pack_FDCT(src, buf, len, 4, 15, FDCT_N, &packedLen);
-        len = PW_Unpack_FDCT(buf, dst, packedLen, 15);
+        len = PW_Pack_FDCT(src, buf, len, 4, 3, FDCT_N/2, &packedLen);
+        len = PW_Unpack_FDCT(buf, dst, packedLen, 3);
 
         det = PW_Determination(src, dst, len, &dev);
         compressRatio = len * 2.0f / packedLen;
@@ -159,8 +171,8 @@ u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* pCompres
 
         if (len > ArraySize(buf)) len = ArraySize(buf);
 
-        len = PW_Pack_FDCT(src, buf, len, 3, 15, FDCT_N, &packedLen);
-        len = PW_Unpack_FDCT(buf, dst, packedLen, 15);
+        len = PW_Pack_FDCT(src, buf, len, 3, 7, FDCT_N/2, &packedLen);
+        len = PW_Unpack_FDCT(buf, dst, packedLen, 7);
 
         det = PW_Determination(src, dst, len, &dev);
         compressRatio = len * 2.0f / packedLen;
@@ -171,8 +183,8 @@ u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* pCompres
 
         if (len > ArraySize(buf)) len = ArraySize(buf);
 
-        len = PW_Pack_FDCT(src, buf, len, 2, 15, FDCT_N, &packedLen);
-        len = PW_Unpack_FDCT(buf, dst, packedLen, 15);
+        len = PW_Pack_FDCT(src, buf, len, 2, 7, FDCT_N/2, &packedLen);
+        len = PW_Unpack_FDCT(buf, dst, packedLen, 7);
 
         det = PW_Determination(src, dst, len, &dev);
         compressRatio = len * 2.0f / packedLen;
@@ -183,8 +195,8 @@ u16 PW_TestPackUnpack(i16* src, i16* dst, u16 len, u16 packType, float* pCompres
 
         if (len > ArraySize(buf)) len = ArraySize(buf);
 
-        len = PW_Pack_FDCT(src, buf, len, 1, 15, FDCT_N, &packedLen);
-        len = PW_Unpack_FDCT(buf, dst, packedLen, 15);
+        len = PW_Pack_FDCT(src, buf, len, 1, 7, FDCT_N/2, &packedLen);
+        len = PW_Unpack_FDCT(buf, dst, packedLen, 7);
 
         det = PW_Determination(src, dst, len, &dev);
         compressRatio = len * 2.0f / packedLen;
