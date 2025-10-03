@@ -398,9 +398,9 @@ u32 MQcompress(byte* src, u32 srclen, byte* dst)
 	{
 		code  = *src++;
 		cx    = ctxt + (lb << 3); 
-		code ^= (code >> 1);
+		//code ^= (code >> 1);
 		
-		for(i = 0;i < 8;i++/*,cx++*/)
+		for(i = 0;i < 8;i++,cx++)
 		{
 			PutBit(&coder, cx/*+((lb>>(i&4))&15)*/,code & (1 << i));
 		};
@@ -417,9 +417,9 @@ u32 MQcompress(byte* src, u32 srclen, byte* dst)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen)
+u32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen)
 {  
-	byte grey[256];
+	//byte grey[256];
 	struct MQContext ctxt[256*8];
 	struct MQContext *cx;
 	struct MQCoder   coder;
@@ -430,7 +430,7 @@ i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen)
 	/*
 	** Initialize the inverse grey coding table.
 	*/
-	for(i = 0;i < 256;i++) grey[i ^ (i >> 1)] = (byte)i;
+	//for(i = 0;i < 256;i++) grey[i ^ (i >> 1)] = (byte)i;
 
 	OpenForRead(&coder, src, srclen);
 
@@ -438,12 +438,12 @@ i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen)
 	{ 
 		cx    = ctxt + (lb << 3);
 
-		for(i = 0, code = 0; i < 8; i++/*,cx++*/)
+		for(i = 0, code = 0; i < 8; i++,cx++)
 		{
 			if (GetBit(&coder, cx/*+((lb>>(i&4))&15)*/)) code |= (1 << i);
 		};
 
-		code  = grey[code];
+		//code  = grey[code];
 		lb    = code;
 		*dst++ = (byte)code; dstlen--;
 
@@ -451,6 +451,64 @@ i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen)
 	};
 
 	return dstlen; 
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+u32 MQcompress16(i16* src, u32 srclen, byte* dst)
+{
+	struct MQContext ctxt[256 * 8];
+	struct MQContext* cx;
+	struct MQCoder   coder;
+	i32 code, i;
+	i32 lb = 0;
+
+	/* reset all contexts */
+	memset(&ctxt, 0, sizeof(ctxt));
+	OpenForWrite(&coder, dst);
+
+	for (u32 i = 0; i < 16; i++)
+	{
+		cx = ctxt /*+ i*/;
+
+		for (u32 n = 0; n < srclen; n++)
+		{
+			PutBit(&coder, cx/*+((lb>>(i&4))&15)*/, (src[n]>>(15-i)) & 1);
+		};
+	};
+
+	Flush(&coder);
+
+	return coder.dstlen;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+u32 MQdecompress16(byte* src, u32 srclen, i16* dst, u32 dstlen)
+{
+	struct MQContext ctxt[256 * 8];
+	struct MQContext* cx;
+	struct MQCoder   coder;
+	i32 code, i, lb = 0;
+
+	/* reset all contexts */
+	memset(&ctxt, 0, sizeof(ctxt));
+
+	OpenForRead(&coder, src, srclen);
+
+	for (u32 i = 0; i < 16; i++)
+	{
+		cx = ctxt /*+ i*/;
+
+		i16 mask = 1 << (15 - i);
+
+		for (u32 n = 0; n < dstlen; n++)
+		{
+			dst[n] = (GetBit(&coder, cx)) ? (dst[n]|mask) : (dst[n] & ~mask);
+		};
+	};
+
+	return dstlen;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

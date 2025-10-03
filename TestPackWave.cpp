@@ -15,10 +15,14 @@ extern int nand_calculate_ecc(const byte* dat, byte* ecc_code);
 extern int nand_correct_data(byte* dat, byte* read_ecc, byte* calc_ecc);
 
 extern u32 MQcompress(byte* src, u32 srclen, byte* dst);
-extern i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen);
+extern u32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen);
 
 u32 huffencode(i16 *wave, u16 wave_len, byte *buf, u16 max_num_bytes);
 u16 huffdecode(byte *buf, u32 num_bits, i16 *wave, u16 max_wave_len);
+
+u32 MQcompress16(i16* src, u32 srclen, byte* dst);
+u32 MQdecompress16(byte* src, u32 srclen, i16* dst, u32 dstlen);
+
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -301,7 +305,7 @@ i16 wave9[256] = { -12,-9,-10,-7,-6,-7,-6,-6,-8,-6,-6,-7,-8,-9,-10,-9,-8,-7,-6,-
 static byte buf1[8192];
 static byte buf2[8192];
 static byte buf3[8192];
-static i16  unpWave1[2048];
+static i16  unpWave1[4096];
 static i16  unpWave2[4096];
 static i16  unpWave3[2048];
 static i16  unpWave4[2048];
@@ -429,15 +433,27 @@ int main()
 
     Test(unpWave1, unpWave2, 600,  "Wave7 13AD-X");
 
-	//u32 len = ArraySize(wave1);
-	u32 len = sizeof(wave9);
 
 	//PW_Pack_uLaw_16Bit(wave1, buf1, len); 
 
-	float mbits = GetLog2bits(wave9, ArraySize(wave9));
+	//float mbits = GetLog2bits(wave9, ArraySize(wave9));
+	
+    u32 len = sizeof(wave9);
 
 	u32 clen = MQcompress((byte*)(wave9), len, buf1);
-	MQdecompress(buf1, clen, (byte*)unpWave2, len);
+	MQdecompress(buf1, clen, (byte*)unpWave1, len);
+
+	len = ArraySize(wave9);
+
+//    PW_Pack_uLaw_12Bit(wave9, buf2, len);
+    //len /= 2;
+
+    //PW_Pack_ADPCMIMA(wave9, buf2, len);
+    //len /= 4;
+
+    clen = MQcompress16(wave9, len, buf3);
+    MQdecompress16(buf3, clen, unpWave2, len);
+
 	
 	//u32 nbits = huffencode(wave4, len, buf1, sizeof(buf1));
 	//huffdecode(buf1, nbits, unpWave2, ArraySize(unpWave2));
