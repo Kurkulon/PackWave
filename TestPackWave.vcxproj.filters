@@ -24,6 +24,12 @@
     <ClCompile Include="cpp\wavelet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mqcoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="huffcoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\wavelet.h">

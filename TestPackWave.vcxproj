@@ -171,6 +171,8 @@
   <ItemGroup>
     <ClCompile Include="cpp\nand_ecc.cpp" />
     <ClCompile Include="cpp\wavelet.cpp" />
+    <ClCompile Include="huffcoder.cpp" />
+    <ClCompile Include="mqcoder.cpp" />
     <ClCompile Include="TestPackWave.cpp" />
   </ItemGroup>
   <ItemGroup>
