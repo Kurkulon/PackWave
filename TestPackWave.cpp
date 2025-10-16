@@ -15,13 +15,18 @@ extern int nand_calculate_ecc(const byte* dat, byte* ecc_code);
 extern int nand_correct_data(byte* dat, byte* read_ecc, byte* calc_ecc);
 
 extern u32 MQcompress(byte* src, u32 srclen, byte* dst);
-extern u32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen);
+extern i32 MQdecompress(byte* src, u32 srclen, byte* dst, u32 dstlen);
 
 u32 huffencode(i16 *wave, u16 wave_len, byte *buf, u16 max_num_bytes);
 u16 huffdecode(byte *buf, u32 num_bits, i16 *wave, u16 max_wave_len);
 
-u32 MQcompress16(i16* src, u32 srclen, byte* dst);
-u32 MQdecompress16(byte* src, u32 srclen, i16* dst, u32 dstlen);
+u32 ArithEncode32(byte *Inp, u32 inpLen, byte *Out, u32 outLen);
+u32 ArithDecode32(byte *Inp, u32 inpLen, byte *Out, u32 outLen);
+
+u32 ArithEncode32_4(byte *Inp, u32 inpLen, byte *Out, u32 outLen);
+
+u32 ArithEncode32_fix(byte *Inp, u32 inpLen, byte *Out, u32 outLen);
+u32 ArithEncode32_stat(byte *Inp, u32 inpLen, byte *Out, u32 outLen);
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -307,8 +312,8 @@ static byte buf2[8192];
 static byte buf3[8192];
 static i16  unpWave1[4096];
 static i16  unpWave2[4096];
-static i16  unpWave3[2048];
-static i16  unpWave4[2048];
+static i16  unpWave3[4096];
+static i16  unpWave4[4096];
 
 static i16  packed1[640];
 static i16  packed2[640];
@@ -381,7 +386,108 @@ float GetLog2bits(i16 *src, u16 len)
 		bits += n;
 	};
 
-	return bits;
+	return (float)bits;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void ZigZagEncode(i16 *src, i16 *dst, u32 len)
+{
+	while (len > 0)
+	{
+		u16 t = *src++;
+
+		t = (t & 0x8000) ? (~(t<<1)) : (t<<1);
+
+		*dst++ = t;
+
+		len--;
+	};
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void ZigZagDecode(i16 *src, i16 *dst, u32 len)
+{
+	while (len > 0)
+	{
+		u16 t = *src++;
+
+		t = (t&1) ?	(~(t>>1)) : (t>>1);
+
+		*dst++ = t;
+
+		len--;
+	};
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+struct Pack12
+{
+	byte	len : 6;
+	byte	wid : 2;
+	byte	data[16];
+};
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+struct Chain12
+{
+	byte	len : 6;
+	byte	wid : 2;
+};
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+byte QuantSample12(i16 v)
+{
+	//if (v < 8 && v > -9)
+	//{
+	//	return 0;
+	//}
+	/*else*/ if (v < 128 && v > -129)
+	{
+		return 1;
+	};
+
+	return 2;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+u32 PackNew12(i16 *src, byte *dst, u32 len)
+{
+	Chain12 buf[1024];
+
+	u32 stind = 0;
+	u32 chainLen = 1;
+	byte pv = QuantSample12(src[0]);
+
+	Chain12 *p = buf;
+
+	for (u32 i = 1; i < len; i++)
+	{
+		byte t = QuantSample12(src[i]);
+
+		if (t != pv || chainLen == 64) 
+		{
+			p->len = chainLen - 1;
+			p->wid = pv;
+
+			pv = t;
+			chainLen = 1;
+			p++;
+		}
+		else
+		{
+			chainLen += 1;
+		}
+	};
+
+	u32 quantLen = p - buf;
+
+	return quantLen;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -433,29 +539,36 @@ int main()
 
     Test(unpWave1, unpWave2, 600,  "Wave7 13AD-X");
 
+#define WAVE wave9
+	//u32 len = ArraySize(WAVE);
+	u32 len = sizeof(WAVE);
 
-	//PW_Pack_uLaw_16Bit(wave1, buf1, len); 
+	i16 temp[ArraySize(WAVE)];
 
-	//float mbits = GetLog2bits(wave9, ArraySize(wave9));
-	
-    u32 len = sizeof(wave9);
+	ZigZagEncode(WAVE, temp, ArraySize(WAVE));
+	//len /= 2;
 
-	u32 clen = MQcompress((byte*)(wave9), len, buf1);
-	MQdecompress(buf1, clen, (byte*)unpWave1, len);
+	//PW_Pack_uLaw_16Bit(WAVE, buf1, len/2); 
 
-	len = ArraySize(wave9);
+	//float mbits = GetLog2bits(WAVE, ArraySize(WAVE));
 
-//    PW_Pack_uLaw_12Bit(wave9, buf2, len);
-    //len /= 2;
+	u32 clen1 = MQcompress((byte*)WAVE, len, buf2);
+	u32 clen2 = MQcompress((byte*)temp, len, buf2);
+	//MQdecompress(buf, clen, (byte*)unpWave1, len);
 
-    //PW_Pack_ADPCMIMA(wave9, buf2, len);
-    //len /= 4;
+	u32 clen3 = ArithEncode32((byte*)WAVE, len, buf3, sizeof(buf3));
+	u32 clen4 = ArithEncode32((byte*)temp, len, buf3, sizeof(buf3));
 
-    clen = MQcompress16(wave9, len, buf3);
-    MQdecompress16(buf3, clen, unpWave2, len);
+	u32 clen5 = ArithEncode32_fix((byte*)WAVE, len, buf3, sizeof(buf3));
+	u32 clen6 = ArithEncode32_fix((byte*)temp, len, buf3, sizeof(buf3));
 
-	
-	//u32 nbits = huffencode(wave4, len, buf1, sizeof(buf1));
+	u32 clen7 = ArithEncode32_stat((byte*)WAVE, len, buf3, sizeof(buf3));
+	u32 clen8 = ArithEncode32_stat((byte*)temp, len, buf3, sizeof(buf3));
+	//ArithDecode32(buf3, clen, (byte*)unpWave3, len);
+
+	PackNew12(WAVE, buf3, len/2);
+
+	//u32 nbits = huffencode(WAVE, len, buf1, sizeof(buf1));
 	//huffdecode(buf1, nbits, unpWave2, ArraySize(unpWave2));
 
 	//PW_Unpack_uLaw_16Bit(buf2, unpWave2, len);

@@ -40,23 +40,43 @@ typedef struct tree_s tree_t;
 // 12357655
 //#include "tree.h"
 
-tree_t static_tree =
+tree_t static_tree_old =
 {
 	12,
 
-	{	{ 0x0000, 2, 4 },
-		{ 0x0002, 3, 7 },
-		{ 0x0007, 3, 5 },
-		{ 0x0004, 3, 6 },
-		{ 0x0005, 3, 3 },
-		{ 0x0006, 4, 1 },
-		{ 0x000C, 4, 2 },
-		{ 0x0007, 4, 8 },
-		{ 0x001A, 5, 0 },
-		{ 0x0037, 6, 9 },
-		{ 0x006C, 7, 11 },
-		{ 0x006D, 7, 10 }, }
+	{	{ 0x0000, 2, 4 },		// xxxx xx00
+		{ 0x0002, 3, 7 },		// xxxx x010
+		{ 0x0007, 3, 5 },		// xxxx x111
+		{ 0x0004, 3, 6 },		// xxxx x100
+		{ 0x0005, 3, 3 },		// xxxx x101
+		{ 0x0006, 4, 1 },		// xxxx 0110
+		{ 0x000C, 4, 2 },		// xxxx 1100
+		{ 0x0007, 4, 8 },		// xxxx 0111
+		{ 0x001A, 5, 0 },		// xxx1 1010
+		{ 0x0037, 6, 9 },		// xx11 0111
+		{ 0x006C, 7, 11 },		// x110 1100
+		{ 0x006D, 7, 10 }, }	// x110 1101
 };
+
+tree_t static_tree =
+{
+	13,
+
+	{{	0x0000, 2, 3	},		// 0
+	{	0x0000, 2, 3	},		// 1
+	{	0x0000, 2, 3	},		// 2
+	{	0x0000, 2, 3	},		// 3
+	{	0x0001, 2, 6	},		// 4
+	{	0x0001, 2, 6	},		// 5
+	{	0x0001, 2, 6	},		// 6
+	{	0x0002, 2, 9	},		// 7
+	{	0x0002, 2, 9	},		// 8
+	{	0x0002, 2, 9	},		// 9
+	{	0x0003, 2, 12	},		// 10
+	{	0x0003, 2, 12	},		// 11
+	{	0x0003, 2, 12	}, }	// 12
+};
+
 
 static inline byte calc_magnitude(u16 val)
 {
@@ -68,11 +88,13 @@ static inline byte calc_magnitude(u16 val)
 	return mag;
 }
 
-struct bit_buffer_s {
-	byte* buf;
-	u16 buf_capacity;
-	u32 n_bits;
-	u32 current_bit;
+struct bit_buffer_s
+{
+	byte	*buf;
+	u16		buf_capacity;
+	u32		n_bits;
+	u32		current_bit;
+	u32		bits;
 };
 
 typedef struct bit_buffer_s bit_buffer_t;
@@ -111,7 +133,7 @@ u16 bb_buf_size(bit_buffer_t* bb);
 // Encodes a signed 16-bit integer using Zigzag encoding
 static inline u16 zigzag_encode16(i16 n)
 {
-	return (n << 1) ^ (n >> 15);
+	return (n << 1) ^ (n >> 16);
 }
 
 // Decodes an unsigned 16-bit integer back to a signed 16-bit integer
@@ -161,7 +183,7 @@ static const u16 masks[16] = {0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f, 0xff,
 
 
 
-static u16 get_n_bits(byte *buf, u32 current_bit, byte n_bits)
+static u16 get_n_bits_old(byte *buf, u32 current_bit, byte n_bits)
 {
 	u32 index = current_bit >> 3;
 	byte bit_no = current_bit & 0x7;
@@ -177,6 +199,20 @@ static u16 get_n_bits(byte *buf, u32 current_bit, byte n_bits)
 	}
 
 	return result & masks[n_bits-1];
+}
+
+static u16 get_n_bits(byte *buf, u32 current_bit, byte n_bits)
+{
+	u32 index = current_bit >> 3;
+	byte bit_no = current_bit & 0x7;
+	u16 result = buf[index];
+
+	if ((bit_no+n_bits) > 7) result |= buf[index+1]<<8;
+
+	result >>= bit_no;
+	result &= ((1<<n_bits)-1);
+
+	return result;
 }
 
 
@@ -212,6 +248,8 @@ u16 bb_get_bits(bit_buffer_t* bb, byte n_bits)
 	return result;
 }
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 bool bb_put_bits(bit_buffer_t* bb, u16 bits, byte n_bits)
 {
 	return_false_if_true(bb == NULL);
@@ -240,6 +278,38 @@ bool bb_put_bits(bit_buffer_t* bb, u16 bits, byte n_bits)
 
 	return true;
 }
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool bb_put_bitsnow(bit_buffer_t* bb, u16 bits, byte n_bits)
+{
+	return_false_if_true(bb == NULL);
+	return_false_if_true(n_bits == 0 || n_bits > 16);
+	return_false_if_true(num_bytes(bb->current_bit + n_bits) > bb->buf_capacity);
+
+	u32 index = bb->current_bit >> 3;
+	//byte bit_no = bb->current_bit & 0x7;
+
+	u32 t = bits & ((1<<n_bits)-1);
+	t <<= bb->n_bits;
+	bb->bits |= t;
+
+	bb->n_bits += n_bits;
+	bb->current_bit += n_bits;
+
+	//bit_no += n_bits;
+
+	while (bb->n_bits > 7)
+	{
+		bb->buf[index++] = (byte)bb->bits;
+		bb->bits >>= 8;
+		bb->n_bits -= 8;
+	};
+
+	return true;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 u16 bb_buf_size(bit_buffer_t* bb)
 {
@@ -532,6 +602,8 @@ static byte get_mag_len(codec_t *codec)
 		{
 			return te->mag_len;
 		};
+
+		te++;
 	};
 
 	return 0;
@@ -550,6 +622,7 @@ u32 huffencode(i16 *wave, u16 wave_len, byte *buf, u16 max_num_bytes)
 	codec.bb.buf_capacity = max_num_bytes;
 	codec.bb.n_bits = 0;
 	codec.bb.current_bit = 0;
+	codec.bb.bits = 0;
 	codec.tree = &static_tree;
 
 	while (len--)
@@ -557,11 +630,13 @@ u32 huffencode(i16 *wave, u16 wave_len, byte *buf, u16 max_num_bytes)
 		sample = zigzag_encode16(*pwave++);
 		mag = calc_magnitude(sample);
 		tree_entry_t *te = &codec.tree->entries[mag];
-		bb_put_bits(&codec.bb, te->bits, te->n_bits);
-		bb_put_bits(&codec.bb, sample, mag);
+		bb_put_bitsnow(&codec.bb, te->bits, te->n_bits);
+		bb_put_bitsnow(&codec.bb, sample, te->mag_len);
 	};
 
-	return codec.bb.n_bits;
+	codec.bb.buf[codec.bb.current_bit>>3] = codec.bb.bits;
+
+	return codec.bb.current_bit;
 }
 
 u16 huffdecode(byte *buf, u32 num_bits, i16 *wave, u16 max_wave_len)
@@ -577,7 +652,7 @@ u16 huffdecode(byte *buf, u32 num_bits, i16 *wave, u16 max_wave_len)
 	codec.bb.current_bit = 0; 
 	codec.tree = &static_tree;
 
-	while (!(n_bits = get_mag_len(&codec)))
+	while (n_bits = get_mag_len(&codec))
 	{
 		*pwave++ = zigzag_decode16(bb_get_bits(&codec.bb, n_bits));
 	};

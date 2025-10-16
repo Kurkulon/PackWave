@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cpp\arith32.cpp" />
     <ClCompile Include="cpp\nand_ecc.cpp" />
     <ClCompile Include="cpp\wavelet.cpp" />
     <ClCompile Include="huffcoder.cpp" />
